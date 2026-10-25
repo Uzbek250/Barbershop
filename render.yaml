@@ -1,0 +1,28 @@
+# Render Blueprint: New > Blueprint > GitHub repo'ni tanlang
+services:
+  - type: web
+    name: navbat-bot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: BOT_TOKEN        # Render so'raganda @BotFather tokenini kiritasiz
+        sync: false
+      - key: ADMIN_IDS        # sartarosh Telegram ID (bir nechta bo'lsa vergul bilan)
+        sync: false
+      - key: SHOP_NAME
+        value: Sartaroshxona
+      - key: AVG_SERVICE_MINUTES
+        value: "20"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: navbat-db
+          property: connectionString
+
+databases:
+  - name: navbat-db
+    plan: free
