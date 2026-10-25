@@ -36,3 +36,15 @@ Blueprintsiz qo'lda: **New → Web Service**
   `DATABASE_URL` ga uning manzilini yozing (`render.yaml` dagi `databases` qismini olib tashlang).
 - Xabar matnlari: `services.py` boshidagi `TXT_CALLED` va `TXT_NEAR`.
 - Taxminiy kutish vaqti: `AVG_SERVICE_MINUTES` (bitta mijozga ketadigan daqiqa).
+
+## 8. Texnik: bazani tozalash
+
+Navbat tarixini (bugungi navbat, mijozlar) tozalash uchun maxfiy kalit bilan:
+
+```bash
+curl -X POST https://navbat-bot-vvfe.onrender.com/admin/clear \
+  -H "X-Clear-Secret: <sha256(BOT_TOKEN)>"
+```
+
+Kalit = `BOT_TOKEN` ning SHA-256 hash'i. `queue_entries` jadvali tozalanadi va
+`settings` (navbat ochiq/yopiq) qayta boshlang'ich holatga qaytadi.
