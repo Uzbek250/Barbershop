@@ -10,12 +10,13 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import Update
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
+from sqlalchemy import text
 
 import config
 
 config.check()  # token kiritilmagan bo'lsa, tushunarli xato bilan to'xtaydi
 
-from db import init_db  # noqa: E402
+from db import SessionLocal, init_db  # noqa: E402
 from handlers import admin, client, common  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -56,6 +57,18 @@ app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None)
 @app.api_route("/health", methods=["GET", "HEAD"])
 async def health():
     return {"status": "ok"}
+
+
+@app.post("/admin/clear")
+async def admin_clear(request: Request):
+    """Vaqtinchalik: navbat bazasini tozalash (maxfiy kalit bilan)."""
+    if request.headers.get("X-Clear-Secret") != config.WEBHOOK_SECRET:
+        raise HTTPException(status_code=403)
+    async with SessionLocal() as s:
+        await s.execute(text("TRUNCATE TABLE queue_entries RESTART IDENTITY"))
+        await s.execute(text("DELETE FROM settings"))
+        await s.commit()
+    return {"ok": True}
 
 
 @app.post("/webhook")
